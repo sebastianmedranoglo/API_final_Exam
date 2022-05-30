@@ -1,13 +1,13 @@
 package base.model;
 
 /**
- * This class contains all details regarding the deserialization of User elements from API
+ * This class contains all details regarding the deserialization of Bank Transactions elements from API
  *
  */
-public class BankAccount {
+public class BankTransaction {
 
     /**
-     * Elements contained by User
+     * Elements contained by Bank Transaction
      */
     private int id;
     private String name;
@@ -20,7 +20,7 @@ public class BankAccount {
     private String country;
     private String telephone;
 
-    public BankAccount(int id, String name, String lastName, int accountNumber, double amount
+    public BankTransaction(int id, String name, String lastName, int accountNumber, double amount
             , String transactionType, String email, boolean active, String country, String telephone) {
         this.id = id;
         this.name = name;
@@ -114,7 +114,7 @@ public class BankAccount {
         this.telephone = telephone;
     }
 
-    public BankAccount() {
+    public BankTransaction() {
     }
 
 }

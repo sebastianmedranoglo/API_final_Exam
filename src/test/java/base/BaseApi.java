@@ -15,9 +15,7 @@ import java.io.IOException;
 public class BaseApi {
 
     public static final String ENDPOINTS_JSON = "src/test/resources/api/endpoints/endpoints.json";
-    public static final String UPDATE_USER = "src/test/resources/api/requests/update_user.json";
-    public static final String CREATE_USER = "src/test/resources/api/requests/create_user.json";
-    public static final String DELETE_USER = "src/test/resources/api/requests/delete_user.json";
+    public static final String UPDATE_BANK_TRANSACTION = "src/test/resources/api/requests/update_bank_transaction.json";
 
     /**
      * This method read JSON files without array/nested structure
@@ -54,18 +52,14 @@ public class BaseApi {
     }
 
     /**
-     * This method creates, update or delete user based on a JSON file filtering by key
+     * This method creates, update or delete bank transactions based on a JSON file filtering by key
      *
-     * @param key
+     * @param action
      * @return String
      */
     public String createRequestByJsonFile(String action) {
-        if (action.equalsIgnoreCase("create")) {
-            return jsonFileToJsonObject(CREATE_USER).toString();
-        } else if (action.equalsIgnoreCase("update")) {
-            return jsonFileToJsonObject(UPDATE_USER).toString();
-        } else if (action.equalsIgnoreCase("delete")) {
-            return jsonFileToJsonObject(DELETE_USER).toString();
+        if (action.equalsIgnoreCase("update")) {
+            return jsonFileToJsonObject(UPDATE_BANK_TRANSACTION).toString();
         }
         return null;
     }

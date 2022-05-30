@@ -1,7 +1,7 @@
 package base.services;
 
 import base.BaseApi;
-import base.model.BankAccount;
+import base.model.BankTransaction;
 import io.restassured.response.Response;
 import net.serenitybdd.rest.SerenityRest;
 import net.thucydides.core.annotations.Step;
@@ -10,16 +10,21 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
- * This Class contains all methods/actions needed by functions related to Subscription Service
+ * This Class contains all methods/actions needed by functions related to Bank transaction service
  */
-public class SubscriptionService {
+public class  BankTransactionsService {
 
     /**
      * Logger by Log4j2 declaration and initialization
      */
-    private static final Logger LOGGER = LogManager.getLogger(SubscriptionService.class);
+    private static final Logger LOGGER = LogManager.getLogger(BankTransactionsService.class);
 
     /**
      * Constants definitions
@@ -60,6 +65,7 @@ public class SubscriptionService {
         LOGGER.info("Send GET request --- Time: " + response.getTime() + " -- Status code: " + response.getStatusCode() +
                 " -- Session ID: " + response.getSessionId());
     }
+
 
     /**
      * This method send a POST query based on a body request
@@ -114,7 +120,7 @@ public class SubscriptionService {
     }
 
     /**
-     * This method DELETE a user by id returning the Response to compare the status code
+     * This method DELETE a bank transaction by id returning the Response to compare the status code
      *
      * @param id
      * @return Response object to assert/compare response code
@@ -132,61 +138,110 @@ public class SubscriptionService {
         return response;
     }
 
-    /**
-     * @param bodyRequest
-     */
-    @Step("I send a DELETE query to {string} with header {string} and body {string}")
-    public void sendDeleteQuery(Map<String, String> bodyRequest) {
-        response = SerenityRest.given()
-                .contentType(CONTENT_TYPE)
-                .header(CONTENT_TYPE, SUBSCRIPTION_CONTENT_TYPE)
-                .body(bodyRequest)
-                .delete(new BaseApi().getEndpointByKey("bankAccount_endpoint"));
 
-        LOGGER.info("Send DELETE Query --- Time: " + response.getTime() + " -- Status code: " + response.getStatusCode() +
-                " -- Session ID: " + response.getSessionId());
-    }
 
     /**
-     * This method returns the list of users from the main service with all contained elements
+     * This method returns the list of bank transactions from the main service with all contained elements
      *
-     * @return List of users from class User
+     * @return List of bank transactions from class bank transaction
      */
-    @Step("I get the list of users from service")
-    public List<BankAccount> getBankAccountListFromService() {
-        return SerenityRest.lastResponse().jsonPath().getList(".", BankAccount.class);
+    @Step("I get the list of bank transactions from service")
+    public List<BankTransaction> getBankAccountListFromService() {
+        return SerenityRest.lastResponse().jsonPath().getList(".", BankTransaction.class);
     }
 
     /**
-     * This method returns the last user created with all content
+     * This method returns the last bank transaction created with all content
      *
-     * @return Last user created as User object
+     * @return Last bank transaction created as bank transaction object
      */
-    @Step("I Get last user from user list")
-    public BankAccount getLastCreatedBankAccount() {
-        List<BankAccount> userListResponse = getBankAccountListFromService();
-        return userListResponse.get(userListResponse.size() - 1);
+    @Step("I Get last bank transaction from bank transaction list")
+    public BankTransaction getLastCreatedBankAccount() {
+        List<BankTransaction> bankTransactionListResponse = getBankAccountListFromService();
+        return bankTransactionListResponse.get(bankTransactionListResponse.size() - 1);
     }
 
     /**
-     * This method updates a User by Id using body information
+     * This method updates a Bank transaction by Id using body information
      *
      * @param body
      * @param id
      * @return Response Object - Response code
      */
-    @Step("I UPDATE User by id using information")
-    public Response updateUserById(Object body, int id) {
+    @Step("I UPDATE bank transaction by id using information")
+    public Response updateBankTransactionById(Object body, int id) {
         response = SerenityRest.given()
                 .contentType(CONTENT_TYPE)
                 .header(CONTENT_TYPE, SUBSCRIPTION_CONTENT_TYPE)
                 .body(body)
-                .put(new BaseApi().getEndpointByKey("my_endpoint") + "/" + id);
+                .put(new BaseApi().getEndpointByKey("bankAccount_endpoint") + "/" + id);
 
         LOGGER.info("Send UPDATE Query --- Time: " + response.getTime() + " -- Status code: " + response.getStatusCode() +
                 " -- Session ID: " + response.getSessionId());
 
         return response;
+    }
+    /**
+     * This method deletes all bank accounts
+     *
+     */
+    @Step("I DELETE all bank accounts")
+    public void deleteAllBankAccounts(){
+        List<BankTransaction> bankAccounts = getBankAccountListFromService();
+        bankAccounts.forEach(bankAccount->sendDeleteQueryById(bankAccount.getId()));
+    }
+
+    /**
+     * This method generate random Strings
+     * @return random String generated
+     */
+    public String  randomString(){
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 10;
+        Random random = new Random();
+
+        return random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+    }
+
+    /**
+     * This method deletes duplicate email accounts
+     *
+     */
+    public void deleteDuplicateEmailAccounts(){
+        List<BankTransaction> bankTransactions = getBankAccountListFromService();
+        List<BankTransaction> nonDuplicatedBankTransactions=bankTransactions.stream()
+                .filter(distinctByKey(transaction->transaction.getEmail())).collect(Collectors.toList());
+        bankTransactions.forEach(bankAccount->{
+                BankTransaction transaction= nonDuplicatedBankTransactions.stream()
+                                .filter(p->p.getId()==bankAccount.getId()).findAny().orElse(null);
+                if(transaction==null){
+                sendDeleteQueryById(bankAccount.getId());
+                }
+        });
+    }
+
+    /**
+     * This method return if there are duplicate email accounts
+     * @return true if there are duplicate email accounts
+     */
+    public boolean isDuplicatedEmailAccounts(){
+        List<BankTransaction> bankTransactions = getBankAccountListFromService();
+        List<BankTransaction> nonDuplicatedBankTransactions=bankTransactions.stream()
+                .filter(distinctByKey(transaction->transaction.getEmail())).collect(Collectors.toList());
+        return bankTransactions.size()>nonDuplicatedBankTransactions.size();
+    }
+
+    /**
+     * This method is a stateful predicate for distinct object by keys
+     */
+    public static <T> Predicate<T> distinctByKey(
+            Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
 }

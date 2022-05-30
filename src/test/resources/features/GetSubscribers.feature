@@ -11,12 +11,12 @@ Feature: POC Example - Get actions
 
   # Get request scenario using endpoint by parameter
   Scenario: Testing an Endpoint - Get action using string parameter
-    Given I get the response from the endpoint "https://61ef2acfd593d20017dbb33b.mockapi.io/api/v1/Data"
+    Given I get the response from the endpoint "https://628d251da3fd714fd03fffa2.mockapi.io/bank/api/v1/account"
     Then I get the response code equals to 200
 
   # Get request scenario using endpoint by parameter
   Scenario: Testing an Endpoint - Get action using string parameter by resource
-    Given I get the endpoint by resource "my_endpoint"
+    Given I get the endpoint by resource "bankAccount_endpoint"
     Then I get the response code equals to 200
 
   # Get request scenario using data table by parameter
@@ -26,9 +26,9 @@ Feature: POC Example - Get actions
 
     Examples:
       | Endpoint                                                  | Status |
-      | "https://61ef2acfd593d20017dbb33b.mockapi.io/api/v1/Data" | 200    |
-      | "https://61ef2acfd593d20017dbb33b.mockapi.io/api/v1/Data" | 200    |
-      | "https://61ef2acfd593d20017dbb33b.mockapi.io/api/v1/Data" | 200    |
+      | "https://628d251da3fd714fd03fffa2.mockapi.io/bank/api/v1/account" | 200    |
+      | "https://628d251da3fd714fd03fffa2.mockapi.io/bank/api/v1/account" | 200    |
+      | "https://628d251da3fd714fd03fffa2.mockapi.io/bank/api/v1/account" | 200    |
 
 
   # Get request scenario using data table by parameter with key
@@ -38,17 +38,8 @@ Feature: POC Example - Get actions
 
     Examples:
       | Key            | Status |
-      | "my_endpoint"  | 200    |
-      | "my_endpoint2" | 200    |
-      | "my_endpoint3" | 200    |
+      | "bankAccount_endpoint"  | 200    |
+      | "bankAccount_endpoint" | 200    |
+      | "bankAccount_endpoint" | 200    |
 
 
-  # Get request scenario using data table comparing against service response body
-  Scenario: Testing an Endpoint - Get action using example table comparing values
-    Given I get the response from the endpoint "https://61ef2acfd593d20017dbb33b.mockapi.io/api/v1/Data"
-    When I get the response code equals to 200
-    Then I compare following data against subscribed users
-      | user  | email            | subscription |
-      | User1 | myUser1@test.com | true         |
-      | User2 | myUser2@test.com | false        |
-      | User3 | myUser3@test.com | true         |
