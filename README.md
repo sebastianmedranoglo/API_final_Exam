@@ -1,10 +1,17 @@
-## Try CommonMark
+# Automation: Test API with Serenity Rest and Cucumber
+````https://628d251da3fd714fd03fffa2.mockapi.io/bank/api/v1/account````
+# Technologies
 
-You can try CommonMark here.  This dingus is powered by
-[commonmark.js](https://github.com/commonmark/commonmark.js), the
-JavaScript reference implementation.
+* Serenity
+* Cucumber
+* Java 8
+* Maven
+* Log4j
 
-1. item one
-2. item two
-    - sublist
-    - sublist
+# Pattern design
+> Behavior Driven Development
+
+# How to get started
+* Clone repository ````https://github.com/sebastianmedranoglo/API_final_Exam````
+* Install dependencies - maven
+* Run "CucumberSuiteTest"
